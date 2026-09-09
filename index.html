@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compound Interest & Retirement Income — TND</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f172a; --panel: #1e293b; --border: #334155;
+    --text: #e2e8f0; --muted: #94a3b8;
+    --accent: #10b981; --deposit: #3b82f6; --gold: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: radial-gradient(1200px 700px at 85% -10%, #1e293b 0%, var(--bg) 55%);
+    color: var(--text); min-height: 100vh; padding: 24px;
+  }
+  header { max-width: 1200px; margin: 0 auto 20px; }
+  h1 {
+    font-size: 1.7rem;
+    background: linear-gradient(90deg, #34d399, #60a5fa);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { color: var(--muted); margin-top: 4px; }
+  .layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  }
+  h2 { font-size: 1.05rem; margin-bottom: 14px; }
+  .field { margin-bottom: 16px; }
+  label { display: block; font-size: .82rem; color: var(--muted); margin-bottom: 6px; }
+  input, select {
+    width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: #0f172a; color: var(--text); font-size: .95rem; outline: none;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+
+  /* ---- Hide number input spinners ---- */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+  .input-wrap { position: relative; }
+  .input-wrap .unit {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: .8rem; pointer-events: none;
+  }
+  .input-wrap input { padding-right: 48px; }
+  .age-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .slider-row { display: flex; gap: 10px; align-items: center; }
+  input[type=range] { flex: 1; padding: 0; accent-color: var(--accent); }
+  input[type=number] { text-align: right; }
+  .note { font-size: .78rem; color: var(--muted); background: #0f172a; border-radius: 8px; padding: 10px; line-height: 1.5; }
+  /* ---- Stats ---- */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .stat { padding: 16px; }
+  .stat-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .stat-value { display: block; font-size: 1.25rem; font-weight: 700; margin-top: 6px; }
+  .stat.hero { background: linear-gradient(135deg, #064e3b, #1e293b); border-color: #065f46; }
+  .stat.hero .stat-value { color: #34d399; font-size: 1.5rem; }
+  .stat.gold { background: linear-gradient(135deg, #3b2f06, #1e293b); border-color: #92400e; }
+  .stat.gold .stat-value { color: #fbbf24; font-size: 1.5rem; }
+  .stat-sub { display: block; font-size: .72rem; color: var(--muted); margin-top: 4px; }
+  /* ---- Chart ---- */
+  .chart-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .toggle button {
+    background: #0f172a; color: var(--muted); border: 1px solid var(--border);
+    padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: .8rem;
+  }
+  .toggle button.active { background: var(--accent); color: #04241a; border-color: var(--accent); font-weight: 600; }
+  #insight { margin: 12px 0; font-size: .88rem; color: #fcd34d; line-height: 1.6; }
+  #insight b { color: var(--gold); }
+  .chart-wrap { position: relative; height: 380px; }
+  /* ---- Table ---- */
+  .table-card { margin-top: 20px; }
+  .table-wrap { overflow: auto; max-height: 520px; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+  thead th {
+    position: sticky; top: 0; background: #0f172a; color: var(--muted);
+    padding: 10px 12px; text-align: right; font-weight: 600; white-space: nowrap;
+  }
+  thead th:first-child, tbody td:first-child { text-align: center; }
+  td { padding: 8px 12px; text-align: right; border-top: 1px solid var(--border); white-space: nowrap; }
+  tbody tr:nth-child(odd) { background: rgba(148,163,184,.04); }
+  tbody tr.wphase { background: rgba(245,158,11,.06); }
+  tbody tr.wphase td:first-child { color: #fbbf24; }
+  .pos { color: #34d399; }
+  .neg { color: #fbbf24; }
+  .strong { font-weight: 700; }
+  tfoot td { background: #0f172a; font-weight: 700; border-top: 2px solid var(--accent); }
+  @media (max-width: 950px) { .layout { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .chart-wrap { height: 300px; } .age-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📈 Compound Interest & Retirement Income</h1>
+  <p>Monthly savings plan → future monthly income · All in Tunisian Dinar (TND)</p>
+</header>
+
+<div class="layout">
+
+  <!-- ============ INPUTS ============ -->
+  <section class="card">
+    <h2>⚙️ Parameters</h2>
+
+    <div class="field">
+      <label>Initial amount (TND)</label>
+      <div class="input-wrap">
+        <input type="number" id="initial" value="0" min="0" step="100">
+        <span class="unit">TND</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Monthly deposit (TND)</label>
+      <div class="input-wrap">
+        <input type="number" id="monthly" value="300" min="0" step="50">
+        <span class="unit">TND</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Annual interest rate (%)</label>
+      <div class="slider-row">
+        <input type="range" id="rateRange" min="0" max="20" step="0.25" value="5">
+        <input type="number" id="rate" value="5" min="0" max="100" step="0.1">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Ages (type freely — validated when you click away)</label>
+      <div class="age-grid">
+        <div>
+          <label style="font-size:.7rem">Current age</label>
+          <input type="number" id="currentAge" value="30" inputmode="numeric">
+        </div>
+        <div>
+          <label style="font-size:.7rem">Stop investing at</label>
+          <input type="number" id="stopAge" value="45" inputmode="numeric">
+        </div>
+        <div>
+          <label style="font-size:.7rem">Money lasts until</label>
+          <input type="number" id="untilAge" value="80" inputmode="numeric">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Interest credited</label>
+      <select id="freq">
+        <option value="yearly">Yearly — on balance + this year's deposits</option>
+        <option value="monthly">Monthly — rate ÷ 12 applied each month</option>
+      </select>
+    </div>
+    <div class="note">
+      💡 <b>Phase 1:</b> you deposit monthly until the "stop" age.<br>
+      💡 <b>Phase 2:</b> the pot keeps earning interest while you withdraw it as a monthly salary until the "lasts until" age.<br>
+      ✍️ All fields are plain typing — no arrows, no auto-rewrite while typing.
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section>
+    <div class="stats">
+      <div class="card stat hero">
+        <span class="stat-label">Balance When Investing Stops</span>
+        <span class="stat-value" id="finalBalance">—</span>
+        <span class="stat-sub" id="heroSub"></span>
+      </div>
+      <div class="card stat gold">
+        <span class="stat-label">Monthly Income After</span>
+        <span class="stat-value" id="monthlyIncome">—</span>
+        <span class="stat-sub" id="incomeSub"></span>
+        <span class="stat-sub" id="perpetualSub"></span>
+      </div>
+      <div class="card stat">
+        <span class="stat-label">Total Money Received</span>
+        <span class="stat-value" id="totalReceived">—</span>
+        <span class="stat-sub" id="receivedSub"></span>
+      </div>
+      <div class="card stat">
+        <span class="stat-label">Total Deposited</span>
+        <span class="stat-value" id="totalDeposited">—</span>
+        <span class="stat-sub" id="depositDetail"></span>
+      </div>
+      <div class="card stat">
+        <span class="stat-label">Interest Earned (lifetime)</span>
+        <span class="stat-value pos" id="totalInterest">—</span>
+        <span class="stat-sub" id="growthSub"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="chart-head">
+        <h2 style="margin:0">📊 Visualization</h2>
+        <div class="toggle">
+          <button id="btnGrowth" class="active">Balance / Deposits / Withdrawals</button>
+          <button id="btnYearly">Interest per Year</button>
+        </div>
+      </div>
+      <div id="insight"></div>
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </div>
+
+    <div class="card table-card">
+      <h2>📅 Year-by-Year Breakdown <span style="color:var(--muted);font-weight:400;font-size:.8rem">(gold rows = withdrawal phase)</span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Year</th><th>Age</th><th>Start Balance</th><th>Deposits</th><th>Withdrawals</th><th>Interest Gained</th><th>End Balance</th></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+          <tfoot id="tfoot"></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const el = id => document.getElementById(id);
+const fmt = n => n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' TND';
+const money = n => n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+let chart = null, view = 'growth';
+
+// Last valid ages — used while a field is empty or mid-typing
+const ages = { current: 30, stop: 45, until: 80 };
+
+function compute() {
+  const initial = Math.max(0, parseFloat(el('initial').value) || 0);
+  const monthly = Math.max(0, parseFloat(el('monthly').value) || 0);
+  const ratePct = Math.max(0, parseFloat(el('rate').value) || 0);
+  const r = ratePct / 100, freq = el('freq').value;
+
+  // ---- Ages: READ ONLY — never overwrite the field while the user types ----
+  const cur = parseInt(el('currentAge').value);
+  if (!isNaN(cur)) ages.current = Math.min(100, Math.max(0, cur));
+
+  const stp = parseInt(el('stopAge').value);
+  if (!isNaN(stp)) ages.stop = Math.min(100, Math.max(1, stp));
+  const stopAge = ages.stop <= ages.current ? ages.current + 1 : ages.stop; // fixed internally only
+
+  const unt = parseInt(el('untilAge').value);
+  if (!isNaN(unt)) ages.until = Math.min(100, Math.max(1, unt));
+  const untilAge = ages.until <= stopAge ? stopAge + 1 : ages.until;        // fixed internally only
+
+  const currentAge = ages.current;
+  const accumYears = stopAge - currentAge;   // phase 1 duration
+  const N = untilAge - stopAge;              // phase 2 duration
+
+  // ---------- PHASE 1 : accumulation ----------
+  let balance = initial;
+  const rows = [];
+  for (let y = 1; y <= accumYears; y++) {
+    const start = balance;
+    let deposits = 0, interest = 0;
+    if (freq === 'yearly') {
+      deposits = monthly * 12;
+      interest = (start + deposits) * r;
+    } else {
+      const mr = r / 12;
+      for (let m = 0; m < 12; m++) {
+        const i = balance * mr;
+        interest += i; balance += i + monthly; deposits += monthly;
+      }
+    }
+    balance = start + deposits + interest;
+    rows.push({year: y, age: currentAge + y, start, deposits, withdrawals: 0, interest, end: balance, phase: 'a'});
+  }
+  const pot = balance;
+
+  // ---------- PHASE 2 : withdrawal until end age ----------
+  // Solve W so balance hits exactly 0 at "until age":
+  // W = pot * r * (1+r)^N / ((1+r)^N - 1)
+  let W = 0, M = 0, perpetual = 0;
+  if (pot > 0) {
+    perpetual = pot * r / 12; // interest-only, capital never shrinks
+    if (N > 0) {
+      if (r === 0) W = pot / N;
+      else {
+        const f = Math.pow(1 + r, N);
+        W = pot * r * f / (f - 1);
+      }
+      M = W / 12;
+      let bal = pot;
+      for (let k = 1; k <= N; k++) {
+        const start = bal;
+        const interest = start * r;
+        bal = start + interest - W;
+        if (k === N) bal = 0; // pot fully consumed
+        rows.push({year: accumYears + k, age: stopAge + k, start, deposits: 0, withdrawals: W, interest, end: bal, phase: 'w'});
+      }
+    }
+  }
+
+  return {initial, monthly, ratePct, r, freq, currentAge, stopAge, untilAge,
+          accumYears, N, rows, pot, W, M, perpetual};
+}
+
+function render() {
+  const d = compute();
+  const totalDep = d.initial + d.monthly * 12 * d.accumYears;
+  const totalWith = d.rows.reduce((s, rw) => s + rw.withdrawals, 0);
+  const leftover = d.rows.length ? d.rows[d.rows.length - 1].end : d.pot;
+  const totalReceived = totalWith + leftover;
+  const totalInt = totalReceived - totalDep;
+  const annualDep = d.monthly * 12;
+
+  // ---- KPI cards ----
+  el('finalBalance').textContent = fmt(d.pot);
+  el('heroSub').textContent = `after ${d.accumYears} yrs · age ${d.currentAge} → ${d.stopAge}`;
+
+  el('monthlyIncome').textContent = d.M > 0 ? fmt(d.M) : (d.perpetual > 0 ? fmt(d.perpetual) : fmt(0));
+  el('incomeSub').textContent = d.N > 0
+    ? `withdrawn age ${d.stopAge} → ${d.untilAge} (${d.N} yrs)`
+    : 'no withdrawal period set';
+  el('perpetualSub').textContent = (d.perpetual > 0 && d.N > 0)
+    ? `or ${money(d.perpetual)}/mo forever (interest only)` : '';
+
+  el('totalReceived').textContent = fmt(totalReceived);
+  el('receivedSub').textContent = totalWith > 0 ? 'cash actually withdrawn + leftover' : '';
+
+  el('totalDeposited').textContent = fmt(totalDep);
+  el('depositDetail').textContent = `${money(d.initial)} initial + ${money(d.monthly)} × 12 × ${d.accumYears}`;
+
+  el('totalInterest').textContent = fmt(totalInt);
+  el('growthSub').textContent = totalDep > 0
+    ? `+${(totalInt / totalDep * 100).toFixed(1)}% vs. money you put in` : '';
+
+  // ---- Insight ----
+  let html = '';
+  if (d.M > 0) {
+    html += `🧓 At age <b>${d.stopAge}</b> you'll have <b>${fmt(d.pot)}</b> — enough to pay yourself <b>≈ ${fmt(d.M)}/month</b> until age <b>${d.untilAge}</b>. Total cash received: <b>≈ ${fmt(totalReceived)}</b>.`;
+  } else if (d.perpetual > 0) {
+    html += `♾️ You could withdraw <b>≈ ${fmt(d.perpetual)}/month forever</b> (interest only) and keep the capital of ${fmt(d.pot)} intact.`;
+  }
+  const crossing = d.rows.find(rw => annualDep > 0 && rw.phase === 'a' && rw.interest > annualDep);
+  if (crossing) {
+    html += `<br>🚀 From year <b>${crossing.year}</b> (age ${crossing.age}), yearly interest exceeds your yearly deposits — money earns more than you add!`;
+  }
+  el('insight').innerHTML = html;
+
+  // ---- Table ----
+  el('tbody').innerHTML = d.rows.map(rw => `
+    <tr class="${rw.phase === 'w' ? 'wphase' : ''}">
+      <td>${rw.year}</td><td>${rw.age}</td><td>${money(rw.start)}</td>
+      <td>${rw.deposits > 0 ? money(rw.deposits) : '—'}</td>
+      <td class="neg">${rw.withdrawals > 0 ? '−' + money(rw.withdrawals) : '—'}</td>
+      <td class="pos">+${money(rw.interest)}</td>
+      <td class="strong">${money(rw.end)}</td>
+    </tr>`).join('');
+  el('tfoot').innerHTML = `
+    <tr>
+      <td>Σ</td><td>—</td><td>${money(d.initial)}</td>
+      <td>${money(totalDep - d.initial)}</td>
+      <td class="neg">−${money(totalWith)}</td>
+      <td class="pos">+${money(totalInt)}</td>
+      <td class="strong">${money(leftover)}</td>
+    </tr>`;
+
+  updateChart(d, totalDep);
+}
+
+function updateChart(d, totalDep) {
+  const labels = [String(d.currentAge)];
+  const balances = [d.initial];
+  const cumDep = [d.initial];
+  const cumWith = [0];
+  d.rows.forEach(rw => {
+    labels.push(String(rw.age));
+    balances.push(+rw.end.toFixed(2));
+    cumDep.push(d.initial + d.monthly * 12 * Math.min(rw.year, d.accumYears));
+    cumWith.push(+(cumWith[cumWith.length - 1] + rw.withdrawals).toFixed(2));
+  });
+
+  let type, datasets;
+  if (view === 'growth') {
+    type = 'line';
+    datasets = [
+      { label: 'Total balance', data: balances,
+        borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.15)',
+        fill: 'origin', tension: .3, pointRadius: 2, borderWidth: 2.5 },
+      { label: 'Deposited (your money)', data: cumDep,
+        borderColor: '#3b82f6', fill: false, tension: .3, pointRadius: 0, borderWidth: 2 },
+      { label: 'Withdrawn (money received)', data: cumWith,
+        borderColor: '#f59e0b', borderDash: [6, 4], fill: false, tension: .3, pointRadius: 0, borderWidth: 2 }
+    ];
+  } else {
+    type = 'bar';
+    datasets = [{
+      label: 'Interest gained that year',
+      data: d.rows.map(rw => +rw.interest.toFixed(2)),
+      backgroundColor: d.rows.map(rw =>
+        (rw.phase === 'a' && d.monthly * 12 > 0 && rw.interest > d.monthly * 12) ? '#f59e0b' : 'rgba(16,185,129,.55)'),
+      borderRadius: 6
+    }];
+  }
+
+  if (chart) chart.destroy();
+  chart = new Chart(el('chart'), {
+    type, data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#cbd5e1' } },
+        tooltip: { callbacks: {
+          title: items => `Age ${items[0].label}`,
+          label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`
+        }}
+      },
+      scales: {
+        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.07)' },
+             title: { display: true, text: 'Age', color: '#94a3b8' } },
+        y: { ticks: { color: '#94a3b8', callback: v => v.toLocaleString() + ' TND' },
+             grid: { color: 'rgba(148,163,184,.10)' } }
+      }
+    }
+  });
+}
+
+// ---- Events ----
+el('btnGrowth').onclick = () => { view = 'growth'; btnToggle(); render(); };
+el('btnYearly').onclick = () => { view = 'yearly'; btnToggle(); render(); };
+function btnToggle() {
+  el('btnGrowth').classList.toggle('active', view === 'growth');
+  el('btnYearly').classList.toggle('active', view === 'yearly');
+}
+el('rateRange').addEventListener('input', e => { el('rate').value = e.target.value; render(); });
+el('rate').addEventListener('input', e => { el('rateRange').value = e.target.value; render(); });
+['initial','monthly','currentAge','stopAge','untilAge'].forEach(id => el(id).addEventListener('input', render));
+el('freq').addEventListener('change', render);
+
+// ---- Age normalization: only when you FINISH typing (click away / Enter) ----
+['currentAge','stopAge','untilAge'].forEach(id =>
+  el(id).addEventListener('change', () => {
+    const d = compute();
+    el('currentAge').value = d.currentAge;
+    el('stopAge').value = d.stopAge;
+    el('untilAge').value = d.untilAge;
+    render();
+  })
+);
+
+render(); // default: 300 TND/mo, 5%, age 30→45 investing, income until 80
+</script>
+</body>
+</html>
