@@ -37,7 +37,7 @@ export default function CalculatorControls({
 }: CalculatorControlsProps) {
   return (
     <section id="params" className="card">
-      <h2>Parameters</h2>
+      <h2>⚙️ Parameters</h2>
 
       <div className="field">
         <label>Initial amount (TND)</label>
@@ -117,9 +117,9 @@ export default function CalculatorControls({
       </div>
 
       <div className="note">
-        <div><b>Phase 1:</b> you deposit monthly until the &ldquo;stop&rdquo; age.</div>
-        <div><b>Phase 2:</b> the pot keeps earning interest while you withdraw it as a monthly salary until the &ldquo;lasts until&rdquo; age.</div>
-        <div>All fields are plain typing — no arrows, no auto-rewrite while typing.</div>
+        <div>💡 <b>Phase 1:</b> you deposit monthly until the &ldquo;stop&rdquo; age.</div>
+        <div>💡 <b>Phase 2:</b> the pot keeps earning interest while you withdraw it as a monthly salary until the &ldquo;lasts until&rdquo; age.</div>
+        <div>✍️ All fields are plain typing — no arrows, no auto-rewrite while typing.</div>
       </div>
     </section>
   );

@@ -23,7 +23,6 @@ export interface YearRow {
 }
 
 export interface PlanResult {
-  inputs: PlanInputs;
   initial: number;
   monthly: number;
   r: number;
@@ -125,7 +124,6 @@ export function computePlan(inputs: PlanInputs): PlanResult {
   const crossing = crossingRow ? { year: crossingRow.year, age: crossingRow.age } : null;
 
   return {
-    inputs,
     initial,
     monthly,
     r,

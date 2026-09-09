@@ -121,7 +121,7 @@ export default function ChartPanel({ d, view, onView }: ChartPanelProps) {
     <div className="card" id="chart">
       <div className="chart-head">
         <h2 className="card-title" style={{ margin: 0 }}>
-          Visualization
+          📊 Visualization
         </h2>
         <div className="toggle">
           <button className={view === "growth" ? "active" : ""} onClick={() => onView("growth")}>

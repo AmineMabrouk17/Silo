@@ -53,7 +53,12 @@ export default function Home() {
   };
 
   return (
-    <div className="calc-layout">
+    <>
+      <div className="page-head">
+        <h1>📈 Compound Interest &amp; Retirement Income</h1>
+        <p>Monthly savings plan → future monthly income · All in Tunisian Dinar (TND)</p>
+      </div>
+      <div className="calc-layout">
       <CalculatorControls
         initial={initial}
         monthly={monthly}
@@ -74,6 +79,7 @@ export default function Home() {
         <ChartPanel d={d} view={view} onView={setView} />
         <YearTable d={d} />
       </section>
-    </div>
+      </div>
+    </>
   );
 }

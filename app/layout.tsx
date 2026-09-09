@@ -29,9 +29,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             Silo
           </a>
           <nav className="header-nav">
-            <Link className="header-link" href="/docs">
-              Docs
-            </Link>
             <Link className="header-link active" href="/">
               Calculator
             </Link>

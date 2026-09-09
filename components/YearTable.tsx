@@ -7,7 +7,7 @@ export default function YearTable({ d }: { d: PlanResult }) {
   return (
     <div className="card table-card" id="table">
       <h2>
-        Year-by-Year Breakdown{" "}
+        📅 Year-by-Year Breakdown{" "}
         <span className="card-title" style={{ color: "var(--muted)", fontWeight: 400, fontSize: "0.8rem" }}>
           (gold rows = withdrawal phase)
         </span>
@@ -42,8 +42,8 @@ export default function YearTable({ d }: { d: PlanResult }) {
             <tr>
               <td>Σ</td>
               <td>—</td>
-              <td>{money(d.inputs.initial)}</td>
-              <td>{money(totalDep - d.inputs.initial)}</td>
+              <td>{money(d.initial)}</td>
+              <td>{money(totalDep - d.initial)}</td>
               <td className="neg">−{money(d.totalWithdrawn)}</td>
               <td className="pos">+{money(d.totalInterest)}</td>
               <td className="strong">{money(d.leftover)}</td>
