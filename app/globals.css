@@ -240,15 +240,8 @@ select:focus {
   border-color: var(--accent);
 }
 
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-  appearance: textfield;
+input[type="number"],
+input[type="text"] {
   text-align: right;
 }
 
@@ -292,7 +285,7 @@ input[type="number"] {
   accent-color: var(--accent);
 }
 
-.slider-row input[type="number"] {
+.slider-row input[type="text"] {
   width: 90px;
 }
 

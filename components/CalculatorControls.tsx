@@ -8,6 +8,14 @@ export interface AgeFields {
   until: string;
 }
 
+const sanitizeDecimal = (v: string) => {
+  const clean = v.replace(/[^0-9.]/g, "");
+  const [head, tail] = clean.split(".");
+  return tail === undefined ? head : head + "." + tail;
+};
+
+const sanitizeInt = (v: string) => v.replace(/\D/g, "");
+
 interface CalculatorControlsProps {
   initial: string;
   monthly: string;
@@ -42,7 +50,7 @@ export default function CalculatorControls({
       <div className="field">
         <label>Initial amount (TND)</label>
         <div className="input-wrap">
-          <input type="number" inputMode="decimal" min={0} step={100} value={initial} onChange={(e) => onInitial(e.target.value)} />
+          <input type="text" inputMode="decimal" value={initial} onChange={(e) => onInitial(sanitizeDecimal(e.target.value))} />
           <span className="unit">TND</span>
         </div>
       </div>
@@ -50,7 +58,7 @@ export default function CalculatorControls({
       <div className="field">
         <label>Monthly deposit (TND)</label>
         <div className="input-wrap">
-          <input type="number" inputMode="decimal" min={0} step={50} value={monthly} onChange={(e) => onMonthly(e.target.value)} />
+          <input type="text" inputMode="decimal" value={monthly} onChange={(e) => onMonthly(sanitizeDecimal(e.target.value))} />
           <span className="unit">TND</span>
         </div>
       </div>
@@ -59,7 +67,7 @@ export default function CalculatorControls({
         <label>Annual interest rate (%)</label>
         <div className="slider-row">
           <input type="range" min={0} max={20} step={0.25} value={rate} onChange={(e) => onRate(e.target.value)} />
-          <input type="number" inputMode="decimal" min={0} max={100} step={0.1} value={rate} onChange={(e) => onRate(e.target.value)} />
+          <input type="text" inputMode="decimal" value={rate} onChange={(e) => onRate(sanitizeDecimal(e.target.value))} />
         </div>
       </div>
 
@@ -69,10 +77,10 @@ export default function CalculatorControls({
           <div>
             <label>Current age</label>
             <input
-              type="number"
+              type="text"
               inputMode="numeric"
               value={ageFields.current}
-              onChange={(e) => onAgeChange("current", e.target.value)}
+              onChange={(e) => onAgeChange("current", sanitizeInt(e.target.value))}
               onBlur={onAgeBlur}
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
@@ -82,10 +90,10 @@ export default function CalculatorControls({
           <div>
             <label>Stop investing at</label>
             <input
-              type="number"
+              type="text"
               inputMode="numeric"
               value={ageFields.stop}
-              onChange={(e) => onAgeChange("stop", e.target.value)}
+              onChange={(e) => onAgeChange("stop", sanitizeInt(e.target.value))}
               onBlur={onAgeBlur}
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
@@ -95,10 +103,10 @@ export default function CalculatorControls({
           <div>
             <label>Money lasts until</label>
             <input
-              type="number"
+              type="text"
               inputMode="numeric"
               value={ageFields.until}
-              onChange={(e) => onAgeChange("until", e.target.value)}
+              onChange={(e) => onAgeChange("until", sanitizeInt(e.target.value))}
               onBlur={onAgeBlur}
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();

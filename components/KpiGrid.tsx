@@ -37,7 +37,7 @@ export default function KpiGrid({ d }: { d: PlanResult }) {
         <span className="stat-label">Total Deposited</span>
         <span className="stat-value">{fmt(d.totalDeposited)}</span>
         <span className="stat-sub">
-          {d.initial} initial + {d.monthly} × 12 × {d.accumYears}
+          {money(d.initial)} initial + {money(d.monthly)} × 12 × {d.accumYears}
         </span>
       </div>
 
