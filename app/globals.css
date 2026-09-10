@@ -1043,25 +1043,9 @@ tbody tr.wphase td:first-child {
   .site-footer {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    text-align: left;
+    justify-content: center;
+    text-align: center;
   }
-}
-
-.footer-links {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 0.6875rem;
-}
-
-.footer-links span {
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.footer-links span:hover {
-  color: #cbd5e1;
 }
 
 /* ---------------- Buttons ---------------- */

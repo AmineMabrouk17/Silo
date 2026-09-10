@@ -110,11 +110,6 @@ export default function Home() {
       {/* Footer */}
       <footer className="site-footer">
         <p>&copy; Silo Financial Intelligence. Formulas strictly compound interest based on periodic annuity mechanics.</p>
-        <div className="footer-links">
-          <span>Security Model</span>
-          <span>API Specs</span>
-          <span>Documentation</span>
-        </div>
       </footer>
     </>
   );
