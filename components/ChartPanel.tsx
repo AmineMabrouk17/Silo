@@ -15,8 +15,7 @@ import {
 } from "chart.js";
 import { Bar, Line } from "react-chartjs-2";
 import type { PlanResult } from "../lib/computePlan";
-import { fmt } from "../lib/format";
-import InsightNote from "./InsightNote";
+import { fmt, money } from "../lib/format";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Legend, Tooltip);
 
@@ -57,7 +56,7 @@ export default function ChartPanel({ d, view, onView }: ChartPanelProps) {
       {
         label: "Deposited (your money)",
         data: cumDep,
-        borderColor: "#3b82f6",
+        borderColor: "#38bdf8",
         fill: false,
         tension: 0.3,
         pointRadius: 0,
@@ -95,45 +94,100 @@ export default function ChartPanel({ d, view, onView }: ChartPanelProps) {
     maintainAspectRatio: false,
     interaction: { mode: "index", intersect: false } as const,
     plugins: {
-      legend: { labels: { color: "#cbd5e1" } },
+      legend: { display: false },
       tooltip: {
+        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        borderColor: "#334155",
+        borderWidth: 1,
+        titleColor: "#94a3b8",
+        bodyColor: "#34d399",
+        titleFont: { family: "'JetBrains Mono', monospace", size: 10 },
+        bodyFont: { family: "'JetBrains Mono', monospace", size: 12, weight: "bold" as const },
+        padding: 10,
+        cornerRadius: 8,
+        displayColors: false,
         callbacks: {
           title: (items: { label: string }[]) => `Age ${items[0].label}`,
           label: (ctx: { dataset: { label?: string }; parsed: { y: number } }) =>
-            ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`,
+            ` ${ctx.dataset.label}: ${money(ctx.parsed.y)} TND`,
         },
       },
     },
     scales: {
       x: {
-        ticks: { color: "#94a3b8" },
-        grid: { color: "rgba(148,163,184,.07)" },
-        title: { display: true, text: "Age", color: "#94a3b8" },
+        ticks: { color: "#64748b", font: { family: "'JetBrains Mono', monospace", size: 10 } },
+        grid: { color: "rgba(30, 41, 59, 0.5)" },
+        border: { color: "#1e293b" },
       },
       y: {
-        ticks: { color: "#94a3b8", callback: (v: number | string) => Number(v).toLocaleString() + " TND" },
-        grid: { color: "rgba(148,163,184,.10)" },
+        ticks: {
+          color: "#64748b",
+          font: { family: "'JetBrains Mono', monospace", size: 10 },
+          callback: (v: number | string) => Math.round(Number(v) / 1000) + "k TND",
+        },
+        grid: { color: "rgba(30, 41, 59, 0.5)" },
+        border: { color: "#1e293b" },
       },
     },
   };
 
   return (
-    <div className="card" id="chart">
-      <div className="chart-head">
-        <h2 className="card-title" style={{ margin: 0 }}>
-          📊 Visualization
-        </h2>
-        <div className="toggle">
+    <div className="chart-card">
+      {/* Chart Header & Mode Tabs */}
+      <div className="chart-header">
+        <div className="chart-header-left">
+          <div className="chart-header-icon">&#128200;</div>
+          <div className="chart-header-text">
+            <h2>Net Worth Trajectory</h2>
+            <p>Accumulation curve against amortized capital</p>
+          </div>
+        </div>
+        <div className="chart-toggle">
           <button className={view === "growth" ? "active" : ""} onClick={() => onView("growth")}>
-            Balance / Deposits / Withdrawals
+            Balance / Withdrawals
           </button>
           <button className={view === "yearly" ? "active" : ""} onClick={() => onView("yearly")}>
-            Interest per Year
+            Interest Breakdown
           </button>
         </div>
       </div>
-      <InsightNote d={d} />
-      <div className="chart-wrap">
+
+      {/* Milestone Callout */}
+      {d.M > 0 && (
+        <div className="insight-callout">
+          <span className="insight-callout-icon">&#10024;</span>
+          <div>
+            At age{" "}
+            <span className="highlight-emerald">{d.stopAge}</span> you will reach{" "}
+            <span className="highlight-white">{fmt(d.pot)}</span> — sufficient to distribute a steady{" "}
+            <span className="highlight-amber">{fmt(d.M).replace(" TND", "")} TND/month</span> until age{" "}
+            <span className="highlight-white">{d.untilAge}</span>. Total money received:{" "}
+            <span className="highlight-emerald">{fmt(d.totalReceived)}</span>.
+          </div>
+        </div>
+      )}
+
+      {/* Legend Bar */}
+      <div className="chart-legend">
+        <div className="chart-legend-items">
+          <div className="chart-legend-item">
+            <span className="chart-legend-dot emerald"></span>
+            <span className="chart-legend-label">Total Balance</span>
+          </div>
+          <div className="chart-legend-item">
+            <span className="chart-legend-dot sky"></span>
+            <span className="chart-legend-label muted">Deposits (Your Capital)</span>
+          </div>
+          <div className="chart-legend-item">
+            <span className="chart-legend-dash"></span>
+            <span className="chart-legend-label muted">Cumulative Withdrawn</span>
+          </div>
+        </div>
+        <span className="chart-legend-interactive">Interactive Canvas (Hoverable)</span>
+      </div>
+
+      {/* Chart Container */}
+      <div className="chart-container">
         {view === "growth" ? (
           <Line data={lineData} options={baseOptions as ChartOptions<"line">} />
         ) : (
