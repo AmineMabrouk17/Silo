@@ -73,9 +73,6 @@ export default function Home() {
           <button className="btn-reset" onClick={handleReset}>
             <span>&#8634;</span> Reset
           </button>
-          <button className="btn-export">
-            <span>&#8599;</span> Export Scenario
-          </button>
         </div>
       </div>
 

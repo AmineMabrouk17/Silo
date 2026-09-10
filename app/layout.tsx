@@ -26,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="brand">
             <div className="brand-mark">S</div>
             <span className="font-semibold tracking-tight text-white flex items-center gap-1.5 text-sm">
-              Silo <span className="brand-version">v2.4</span>
+              Silo <span className="brand-version">v beta</span>
             </span>
           </div>
           <div className="header-right">
@@ -36,7 +36,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </span>
             <div className="header-currency">
               <span className="currency-icon">$</span>
-              <span>Tunisian Dinar (TND)</span>
+              <span>Tunisian Dinar</span>
+              <span className="header-currency-symbol">TND</span>
             </div>
           </div>
         </header>
