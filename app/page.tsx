@@ -52,34 +52,73 @@ export default function Home() {
     setAgeFields({ current: String(r.currentAge), stop: String(r.stopAge), until: String(r.untilAge) });
   };
 
+  const handleReset = () => {
+    setInitial("0");
+    setMonthly("300");
+    setRate("5");
+    setAgeFields({ current: "30", stop: "45", until: "80" });
+    setFreq("yearly");
+  };
+
   return (
     <>
+      {/* Page Header */}
       <div className="page-head">
-        <h1>📈 Compound Interest &amp; Retirement Income</h1>
-        <p>Monthly savings plan → future monthly income · All in Tunisian Dinar (TND)</p>
-      </div>
-      <div className="calc-layout">
-      <CalculatorControls
-        initial={initial}
-        monthly={monthly}
-        rate={rate}
-        ageFields={ageFields}
-        freq={freq}
-        onInitial={setInitial}
-        onMonthly={setMonthly}
-        onRate={setRate}
-        onAgeChange={(key, v) => setAgeFields((f) => ({ ...f, [key]: v }))}
-        onAgeBlur={normalizeAges}
-        onFreq={setFreq}
-      />
-      <section>
-        <div id="results">
-          <KpiGrid d={d} />
+        <div className="page-head-left">
+          <div className="page-head-dot"></div>
+          <h1>Compound Interest &amp; Retirement Income</h1>
         </div>
-        <ChartPanel d={d} view={view} onView={setView} />
-        <YearTable d={d} />
-      </section>
+        <p className="hidden sm:block">Monthly savings plan → future wealth longevity &bull; Figures calculated in Tunisian Dinar (TND)</p>
+        <div className="page-head-actions">
+          <button className="btn-reset" onClick={handleReset}>
+            <span>&#8634;</span> Reset
+          </button>
+          <button className="btn-export">
+            <span>&#8599;</span> Export Scenario
+          </button>
+        </div>
       </div>
+
+      {/* Bento Layout Grid */}
+      <div className="bento-grid">
+        {/* Left Column: Parameter Inputs (4 cols) */}
+        <div className="bento-inputs">
+          <CalculatorControls
+            initial={initial}
+            monthly={monthly}
+            rate={rate}
+            ageFields={ageFields}
+            freq={freq}
+            onInitial={setInitial}
+            onMonthly={setMonthly}
+            onRate={setRate}
+            onAgeChange={(key, v) => setAgeFields((f) => ({ ...f, [key]: v }))}
+            onAgeBlur={normalizeAges}
+            onFreq={setFreq}
+          />
+        </div>
+
+        {/* Right Column: Dashboard & Metrics (8 cols) */}
+        <div className="bento-dashboard">
+          <KpiGrid d={d} />
+          <ChartPanel d={d} view={view} onView={setView} />
+        </div>
+      </div>
+
+      {/* Year-by-Year Table */}
+      <div className="table-section">
+        <YearTable d={d} />
+      </div>
+
+      {/* Footer */}
+      <footer className="site-footer">
+        <p>&copy; Silo Financial Intelligence. Formulas strictly compound interest based on periodic annuity mechanics.</p>
+        <div className="footer-links">
+          <span>Security Model</span>
+          <span>API Specs</span>
+          <span>Documentation</span>
+        </div>
+      </footer>
     </>
   );
 }

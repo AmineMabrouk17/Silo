@@ -2,24 +2,36 @@ import type { PlanResult } from "../lib/computePlan";
 import { money } from "../lib/format";
 
 export default function YearTable({ d }: { d: PlanResult }) {
-  const totalDep = d.totalDeposited;
-
   return (
-    <div className="card table-card" id="table">
-      <h2>
-        📅 Year-by-Year Breakdown{" "}
-        <span className="card-title" style={{ color: "var(--muted)", fontWeight: 400, fontSize: "0.8rem" }}>
-          (gold rows = withdrawal phase)
-        </span>
-      </h2>
-      <div className="table-wrap">
+    <div className="table-card">
+      <div className="table-header">
+        <div className="table-header-left">
+          <div className="table-header-icon">&#128203;</div>
+          <div className="table-header-text">
+            <h2>Year-by-Year Financial Schedule</h2>
+            <p>Complete amortization, deposit logs, and interest allocations</p>
+          </div>
+        </div>
+        <div className="table-legend">
+          <div className="table-legend-item">
+            <span className="table-legend-dot amber"></span>
+            <span className="table-legend-text">Withdrawal Phase</span>
+          </div>
+          <div className="table-legend-item">
+            <span className="table-legend-dot emerald"></span>
+            <span className="table-legend-text">Accumulation Phase</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="table-scroll">
         <table>
           <thead>
             <tr>
               <th>Year</th>
               <th>Age</th>
               <th>Start Balance</th>
-              <th>Deposits</th>
+              <th>Annual Deposits</th>
               <th>Withdrawals</th>
               <th>Interest Gained</th>
               <th>End Balance</th>
@@ -28,27 +40,20 @@ export default function YearTable({ d }: { d: PlanResult }) {
           <tbody>
             {d.rows.map((rw) => (
               <tr key={rw.year} className={rw.phase === "w" ? "wphase" : ""}>
-                <td>{rw.year}</td>
-                <td>{rw.age}</td>
-                <td>{money(rw.start)}</td>
-                <td>{rw.deposits > 0 ? money(rw.deposits) : "—"}</td>
-                <td className="neg">{rw.withdrawals > 0 ? `−${money(rw.withdrawals)}` : "—"}</td>
-                <td className="pos">+{money(rw.interest)}</td>
-                <td className="strong">{money(rw.end)}</td>
+                <td style={{ color: "#94a3b8" }}>{rw.year}</td>
+                <td style={{ fontWeight: 600 }}>{rw.age}</td>
+                <td style={{ color: "#94a3b8" }}>{money(rw.start)}</td>
+                <td className={rw.deposits > 0 ? "text-sky" : "text-slate-dim"}>
+                  {rw.deposits > 0 ? money(rw.deposits) : "\u2014"}
+                </td>
+                <td className={rw.withdrawals > 0 ? "text-amber font-bold" : "text-slate-dim"}>
+                  {rw.withdrawals > 0 ? money(rw.withdrawals) : "\u2014"}
+                </td>
+                <td className="text-emerald">+{money(rw.interest)}</td>
+                <td className="font-bold" style={{ color: "#f1f5f9" }}>{money(rw.end)}</td>
               </tr>
             ))}
           </tbody>
-          <tfoot>
-            <tr>
-              <td>Σ</td>
-              <td>—</td>
-              <td>{money(d.initial)}</td>
-              <td>{money(totalDep - d.initial)}</td>
-              <td className="neg">−{money(d.totalWithdrawn)}</td>
-              <td className="pos">+{money(d.totalInterest)}</td>
-              <td className="strong">{money(d.leftover)}</td>
-            </tr>
-          </tfoot>
         </table>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,63 +13,36 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Compound Interest & Retirement Income — TND",
+  title: "Compound Interest & Retirement Income Calculator",
   description:
-    "Monthly savings plan to future monthly income, in Tunisian Dinar. Rebuilt with the spell.sh docs aesthetic.",
+    "Monthly savings plan to future monthly income, in Tunisian Dinar. A bento-style financial intelligence dashboard.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`dark ${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <header className="site-header">
-          <a className="brand" href="#">
-            <span className="brand-mark">S</span>
-            Silo
-          </a>
-          <nav className="header-nav">
-            <Link className="header-link active" href="/">
-              Calculator
-            </Link>
-          </nav>
-          <div className="header-spacer" />
-          <span className="header-tag">Tunisian Dinar (TND)</span>
+          <div className="brand">
+            <div className="brand-mark">S</div>
+            <span className="font-semibold tracking-tight text-white flex items-center gap-1.5 text-sm">
+              Silo <span className="brand-version">v2.4</span>
+            </span>
+          </div>
+          <div className="header-right">
+            <span className="header-status">
+              <span className="dot"></span>
+              Realtime Model
+            </span>
+            <div className="header-currency">
+              <span className="currency-icon">$</span>
+              <span>Tunisian Dinar (TND)</span>
+            </div>
+          </div>
         </header>
 
-        <div className="chrome">
-          <aside className="side-rail">
-            <nav>
-              <div className="side-cat">Getting Started</div>
-              <Link className="side-link active" href="/">
-                Calculator
-              </Link>
-            </nav>
-            <nav>
-              <div className="side-cat">On this page</div>
-              <a className="side-link" href="#params">
-                Parameters
-              </a>
-              <a className="side-link" href="#results">
-                Results
-              </a>
-              <a className="side-link" href="#chart">
-                Visualization
-              </a>
-              <a className="side-link" href="#table">
-                Breakdown
-              </a>
-            </nav>
-            <nav>
-              <div className="side-cat">About</div>
-              <a className="side-link" href="https://github.com/AmineMabrouk17/Silo" target="_blank" rel="noopener noreferrer">
-                Source on GitHub
-              </a>
-              <a className="side-link" href="https://spell.sh/docs/components" target="_blank" rel="noopener noreferrer">
-                spell.sh design
-              </a>
-            </nav>
-          </aside>
-          <main>{children}</main>
+        <div className="page-container">
+          {children}
         </div>
       </body>
     </html>
